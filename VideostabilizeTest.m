@@ -22,6 +22,9 @@ clear variables
 filename = 'MAH01462.mp4';
 
 hVideoSource = VideoReader(filename);
+a=VideoWriter('C:\Timo Lempers\Masters\Image Processing\Project\project 2\stabilized2.avi');
+%%
+open(a);
 
 %%
 % Create a template matcher System object to compute the location of the
@@ -36,7 +39,7 @@ hTM = vision.TemplateMatcher('ROIInputPort', true, ...
 hVideoOut = vision.VideoPlayer('Name', 'Video Stabilization');
 hVideoOut.Position(1) = round(0.4*hVideoOut.Position(1));
 hVideoOut.Position(2) = round(1.5*(hVideoOut.Position(2)));
-hVideoOut.Position(3:4) = [650 350];
+hVideoOut.Position(3:4) = [1650 350];
 
 %%
 % Here we initialize some variables used in the processing loop.
@@ -62,9 +65,11 @@ firstTime = true;
 %% Stream Processing Loop
 % This is the main processing loop which uses the objects we instantiated
 % above to stabilize the input video.
+for t=1:433
 while hasFrame(hVideoSource)
     input = rgb2gray(im2double(readFrame(hVideoSource)));
-
+    %input = im2double(readFrame(hVideoSource));
+%%
     % Find location of Target in the input video frame
     if firstTime
       Idx = int32(pos.template_center_pos);
@@ -102,15 +107,12 @@ while hasFrame(hVideoSource)
     input = insertText(input(:,:,1),[191 215],txt,'FontSize',16, ...
                     'TextColor', 'white', 'BoxOpacity', 0);
     % Display video
-    hVideoOut([input(:,:,1) Stabilized]);
+%%
+    hVideoOut([input(:,:,2) Stabilized]);
+writeVideo(a,Stabilized);
+end
 end
 
-%% Conclusion
-% Using the Computer Vision Toolbox(TM) functionality from
-% MATLAB(R) command line it is easy to implement complex systems like video
-% stabilization.
 
-%% Appendix
-% The following helper function is used in this example.
-%
-% * <matlab:edit('updatesearch.m') updatesearch.m>
+ %%
+ close(a);
