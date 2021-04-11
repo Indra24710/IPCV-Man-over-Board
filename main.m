@@ -1,3 +1,5 @@
+close all;
+
 numImages = 26;
 files = cell(1, numImages);
 val=1;
@@ -37,12 +39,12 @@ open(writerObj);
 
 while hasFrame(obj.reader)
     image = readFrame(obj.reader);
-    %image = (imread('C:\Timo Lempers\Masters\Image Processing\Project\project 2\blobAnalysis\examples\Screenshot.png')); %Reads the Image document
+    %image = (  imread('C:\Timo Lempers\Masters\Image Processing\Project\project 2\blobAnalysis\examples\Screenshot.png')); %Reads the Image document
     %imshow(image);
  image2 = insertShape(image,'FilledRectangle', [0 0 2000 505],'Color',{'green'});
  image2 = insertShape(image2,'FilledRectangle', [0 0 600 2000],'Color',{'green'});
  image2 = insertShape(image2,'FilledRectangle', [1100 0 500 2000],'Color',{'green'});
- image2 = insertShape(image2,'FilledRectangle', [0 555 2000 500],'Color',{'green'});  
+ image2 = insertShape(image2,'FilledRectangle', [0 555 2000 700],'Color',{'green'});  
  I = image2;
 
    channel1Min = 226.000;
@@ -64,42 +66,29 @@ channel3Max = 255.000;
     %subplot(1,3,2)
     %imshow(sliderBW)
 
-    [im, newOrigin] = undistortImage(image, cameraParams, 'OutputView', 'full');
+ %[im, newOrigin] = undistortImage(image2, cameraParams, 'OutputView', 'full');
 
     hBlobAnalysis = vision.BlobAnalysis('MinimumBlobArea' , 1, ...
         'MaximumBlobArea',5);
     [objArea, objCentroid,bboxOut] = step(hBlobAnalysis,sliderBW);
 
 
-    Ishape = insertShape(image, 'rectangle',bboxOut,'Linewidth',4);
-    
-        % Detect the checkerboard.
-    %[imagePoints, boardSize] = detectCheckerboardPoints(im);
+    Ishape = insertShape(image2, 'rectangle',bboxOut,'Linewidth',4);
+    delta = (sqrt(0.98*8.2))/60;  
 
-    % Adjust the imagePoints so that they are expressed in the coordinate system
-    % used in the original image, before it was undistorted.  This adjustment
-    % makes it compatible with the cameraParameters object computed for the original image.
-    %imagePoints = imagePoints + newOrigin; % adds newOrigin to every row of imagePoints
-    %imagePoints=imagePoints(:,:,1);
-    % Compute rotation and translation of the camera.
-    [R, t] = extrinsics(imagePoints, worldPoints, cameraParams);
-    % Compute the center of the first coin in the image.
-    center1_image = bboxOut(1:2) + bboxOut(3:4)/2;
+if isempty(bboxOut)==0
+focallength = 1.675213074929131e+03;
+buoy_dist=abs(515-bboxOut(2));
+gamma = atand(double(buoy_dist)/focallength);
 
-    % Convert to world coordinates.
-    center1_world  = pointsToWorld(cameraParams, R, t, center1_image);
+beta = 90-gamma-delta;
 
-    % Remember to add the 0 z-coordinate.
-    center1_world = [center1_world 0];
-
-    % Compute the distance to the camera.
-    [~, cameraLocation] = extrinsicsToCameraPose(R, t);
-    distanceToCamera = norm(center1_world - cameraLocation);
-    fprintf('Distance from the camera to the first penny = %0.2f mm\n', ...
-        distanceToCamera);
-        %figure
-    %subplot(1,2,1)
-    %imshow(Ishape)
+R=6371000;
+h=2.5;
+d = (R+2.5)*cosd(beta)-sqrt((R+h)^2*(cosd(beta)^2)-(R+h)^2+R^2);
+     fprintf('Distance from the camera to the buoy = %0.2f m\n', ...
+        d);
+end
     release(hBlobAnalysis);
     imwrite(Ishape,strcat('image',int2str(i),'.png'));
     frame=imread(strcat('image',int2str(i),'.png'));
@@ -113,9 +102,8 @@ close(writerObj);
 function obj = setupSystemObjects()
         % Initialize Video I/O
         % Create objects for reading a video from a file, drawing the tracked
-        % objects in each frame, and playing the video.newOrigin
+        % objects in each frame, and playing the video.
         obj.reader = VideoReader('StabilizedVideo.avi');
 
         obj.videoFWriter=vision.VideoFileWriter('result3.avi');
 end
-
