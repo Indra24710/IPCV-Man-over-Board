@@ -17,10 +17,10 @@ while hasFrame(obj.reader)
     image = readFrame(obj.reader);
     %image = (imread('C:\Timo Lempers\Masters\Image Processing\Project\project 2\blobAnalysis\examples\Screenshot.png')); %Reads the Image document
     %imshow(image);
- image2 = insertShape(image,'FilledRectangle', [0 0 2000 515],'Color',{'green'});
- image2 = insertShape(image2,'FilledRectangle', [0 0 600 2000],'Color',{'green'});
- image2 = insertShape(image2,'FilledRectangle', [1100 0 500 2000],'Color',{'green'});
- image2 = insertShape(image2,'FilledRectangle', [0 555 2000 700],'Color',{'green'});  
+ image2 = insertShape(image,'FilledRectangle', [0 0 2000 523],'Color',{'green'});
+ image2 = insertShape(image2,'FilledRectangle', [0 0 655+i/2 2000],'Color',{'green'});
+ image2 = insertShape(image2,'FilledRectangle', [1062 0 500 2000],'Color',{'green'});
+ image2 = insertShape(image2,'FilledRectangle', [0 551 2000 700],'Color',{'green'});  
  I = image2;
 
    channel1Min = 226.000;
@@ -63,7 +63,7 @@ d = (R+h)*cosd(beta)-sqrt((R+h)^2*(cosd(beta)^2)-(R+h)^2+R^2);
 Distance = 1;
 end
 
-    Ishape = insertShape(image, 'rectangle',bboxOut,'Linewidth',4);
+    Ishape = insertShape(image2, 'rectangle',bboxOut,'Linewidth',4);
 if Distance == 0
     Ishape = insertText(Ishape, [100 100],"No Buoy Found", 'FontSize', 24);
 end
